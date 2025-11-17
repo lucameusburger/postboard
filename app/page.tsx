@@ -1,6 +1,6 @@
 import { collectionName, getTexts } from '@/lib/directus';
 
-import Link from 'next/link';
+import FixedButton from '@/components/FixedButton';
 import RealtimeTexts from '@/components/RealtimeTexts';
 import TextItem from '@/components/TextItem';
 
@@ -14,8 +14,8 @@ export default async function Home({
   const isPresentation = params?.presentation === 'true';
 
   return (
-    <div className="min-h-screen text-5xl">
-      <main className="mx-auto p-4">
+    <div className={isPresentation ? "h-screen w-screen overflow-hidden" : "min-h-screen text-5xl"}>
+      <main className={isPresentation ? "h-full w-full" : "mx-auto p-4"}>
         {isPresentation ? (
           <RealtimeTexts initialTexts={data} collectionName={collectionName} />
         ) : (
@@ -28,12 +28,9 @@ export default async function Home({
       </main>
 
       {!isPresentation && (
-        <Link
-          href="/add"
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 rounded-full bg-foreground px-8 py-4 text-background font-medium transition-colors hover:bg-[#383838] shadow-lg z-50"
-        >
-          Text hinzufügen
-        </Link>
+        <FixedButton href="/add">
+          Hinzufügen
+        </FixedButton>
       )}
     </div>
   );

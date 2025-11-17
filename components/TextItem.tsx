@@ -7,9 +7,10 @@ import type { Post } from '@/lib/directus';
 interface TextItemProps {
     item: Post;
     isNew?: boolean;
+    onDisplayedLengthChange?: (length: number) => void;
 }
 
-export default function TextItem({ item, isNew = false }: TextItemProps) {
+export default function TextItem({ item, isNew = false, onDisplayedLengthChange }: TextItemProps) {
     const fullText = useMemo(() => `#${item.content} `, [item.content]);
     const [displayedLength, setDisplayedLength] = useState<number>(
         isNew ? 0 : fullText.length
@@ -36,6 +37,16 @@ export default function TextItem({ item, isNew = false }: TextItemProps) {
 
         return () => clearInterval(typeInterval);
     }, [isNew, fullText]);
+
+    // Notify parent of displayed length changes
+    useEffect(() => {
+        onDisplayedLengthChange?.(displayedLength);
+    }, [displayedLength, onDisplayedLengthChange]);
+
+    // Also notify on mount/initial state
+    useEffect(() => {
+        onDisplayedLengthChange?.(displayedLength);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const displayedText = fullText.slice(0, displayedLength);
 
