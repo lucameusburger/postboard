@@ -18,11 +18,13 @@ export default function RealtimeTexts({
     const [texts, setTexts] = useState<Post[]>(initialTexts);
     const [newTextIds, setNewTextIds] = useState<Set<string>>(new Set());
     // Initialize displayed lengths for initial texts
+    // Logo counts as 1 character, then text content + space
     const [displayedLengths, setDisplayedLengths] = useState<Map<string, number>>(() => {
         const initialMap = new Map<string, number>();
         initialTexts.forEach((text) => {
-            const fullText = `#${text.content} `;
-            initialMap.set(String(text.id), fullText.length);
+            const fullText = `${text.content} `;
+            // Logo (1) + text length
+            initialMap.set(String(text.id), fullText.length + 1);
         });
         return initialMap;
     });
@@ -70,8 +72,8 @@ export default function RealtimeTexts({
                                     return updated;
                                 });
                                 // Calculate animation duration based on text length
-                                // TextItem adds "#" prefix and " " suffix, and uses 60ms per character
-                                const fullTextLength = `#${newText.content} `.length;
+                                // TextItem adds Logo (counts as 1) + " " suffix, and uses 60ms per character
+                                const fullTextLength = `${newText.content} `.length + 1; // +1 for logo
                                 const animationDuration = fullTextLength * 60;
                                 // Remove from newTextIds after animation completes
                                 setTimeout(() => {
@@ -207,14 +209,17 @@ export default function RealtimeTexts({
                     overflowWrap: 'break-word',
                 }}
             >
-                {texts.map((item) => (
-                    <TextItem
-                        key={item.id}
-                        item={item}
-                        isNew={newTextIds.has(String(item.id))}
-                        onDisplayedLengthChange={(length) => handleDisplayedLengthChange(String(item.id), length)}
-                    />
-                ))}
+                {texts.map((item) => {
+                    const itemId = String(item.id);
+                    return (
+                        <TextItem
+                            key={item.id}
+                            item={item}
+                            isNew={newTextIds.has(itemId)}
+                            onDisplayedLengthChange={(length) => handleDisplayedLengthChange(itemId, length)}
+                        />
+                    );
+                })}
             </div>
         </div>
     );
