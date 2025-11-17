@@ -11,6 +11,12 @@ interface RealtimeTextsProps {
     collectionName: string;
 }
 
+interface OverlayItem {
+    id: string;
+    content: string;
+    startTime: number;
+}
+
 export default function RealtimeTexts({
     initialTexts,
     collectionName,
@@ -31,6 +37,73 @@ export default function RealtimeTexts({
     const [fontSize, setFontSize] = useState<number>(48);
     const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+
+    // Overlay animation queue
+    const [currentOverlay, setCurrentOverlay] = useState<OverlayItem | null>(null);
+    const [overlayDisplayedLength, setOverlayDisplayedLength] = useState<number>(0);
+    const [overlayExiting, setOverlayExiting] = useState<boolean>(false);
+    const overlayQueueRef = useRef<OverlayItem[]>([]);
+    const isProcessingOverlayRef = useRef<boolean>(false);
+    const overlayTypewriterIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const OVERLAY_CHAR_DELAY = 40; // ms per character for typewriter
+    const OVERLAY_DISPLAY_TIME = 2000; // ms to display full text after typing completes
+    const OVERLAY_EXIT_DURATION = 300; // ms for swipe out animation
+
+    // Process overlay queue
+    const processOverlayQueue = useCallback(() => {
+        if (isProcessingOverlayRef.current || overlayQueueRef.current.length === 0) {
+            return;
+        }
+
+        const nextItem = overlayQueueRef.current.shift();
+        if (!nextItem) {
+            return;
+        }
+
+        isProcessingOverlayRef.current = true;
+        setCurrentOverlay(nextItem);
+        setOverlayDisplayedLength(0);
+        setOverlayExiting(false);
+
+        // Start typewriter animation
+        const textLength = nextItem.content.length;
+        let currentLength = 0;
+
+        // Clear any existing interval
+        if (overlayTypewriterIntervalRef.current) {
+            clearInterval(overlayTypewriterIntervalRef.current);
+        }
+
+        overlayTypewriterIntervalRef.current = setInterval(() => {
+            currentLength++;
+            setOverlayDisplayedLength(currentLength);
+
+            if (currentLength >= textLength) {
+                if (overlayTypewriterIntervalRef.current) {
+                    clearInterval(overlayTypewriterIntervalRef.current);
+                    overlayTypewriterIntervalRef.current = null;
+                }
+
+                // After typing completes, show full text for a bit, then swipe out
+                setTimeout(() => {
+                    setOverlayExiting(true);
+
+                    // After exit animation completes, remove overlay and process next
+                    setTimeout(() => {
+                        setCurrentOverlay(null);
+                        setOverlayDisplayedLength(0);
+                        setOverlayExiting(false);
+                        isProcessingOverlayRef.current = false;
+
+                        // Process next item in queue
+                        if (overlayQueueRef.current.length > 0) {
+                            setTimeout(() => processOverlayQueue(), 100); // Small delay between overlays
+                        }
+                    }, OVERLAY_EXIT_DURATION);
+                }, OVERLAY_DISPLAY_TIME);
+            }
+        }, OVERLAY_CHAR_DELAY);
+    }, []);
 
     useEffect(() => {
         const directusUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL;
@@ -71,6 +144,18 @@ export default function RealtimeTexts({
                                     updated.set(String(newText.id), 0);
                                     return updated;
                                 });
+
+                                // Add to overlay queue
+                                const overlayItem: OverlayItem = {
+                                    id: String(newText.id),
+                                    content: newText.content,
+                                    startTime: Date.now(),
+                                };
+                                overlayQueueRef.current.push(overlayItem);
+
+                                // Process overlay queue
+                                processOverlayQueue();
+
                                 // Calculate animation duration based on text length
                                 // TextItem adds Logo (counts as 1) + " " suffix, and uses 60ms per character
                                 const fullTextLength = `${newText.content} `.length + 1; // +1 for logo
@@ -98,8 +183,12 @@ export default function RealtimeTexts({
                 subscriptionRef.current.unsubscribe();
                 subscriptionRef.current = null;
             }
+            if (overlayTypewriterIntervalRef.current) {
+                clearInterval(overlayTypewriterIntervalRef.current);
+                overlayTypewriterIntervalRef.current = null;
+            }
         };
-    }, [collectionName]);
+    }, [collectionName, processOverlayQueue]);
 
     // Handle displayed length changes from TextItem components
     const handleDisplayedLengthChange = useCallback((itemId: string, length: number) => {
@@ -186,42 +275,98 @@ export default function RealtimeTexts({
     }, [displayedLengths]);
 
     return (
-        <div
-            ref={containerRef}
-            style={{
-                fontSize: `${fontSize}px`,
-                transition: 'font-size 0.3s ease-out',
-                height: '100vh',
-                width: '100vw',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '2rem',
-                boxSizing: 'border-box',
-                overflow: 'hidden',
-            }}
-        >
+        <>
             <div
+                ref={containerRef}
                 style={{
-                    width: '100%',
-                    lineHeight: 0.9,
-                    wordWrap: 'break-word',
-                    overflowWrap: 'break-word',
+                    fontSize: `${fontSize}px`,
+                    transition: 'font-size 0.3s ease-out',
+                    height: '100vh',
+                    width: '100vw',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '2rem',
+                    boxSizing: 'border-box',
+                    overflow: 'hidden',
                 }}
             >
-                {texts.map((item) => {
-                    const itemId = String(item.id);
-                    return (
-                        <TextItem
-                            key={item.id}
-                            item={item}
-                            isNew={newTextIds.has(itemId)}
-                            onDisplayedLengthChange={(length) => handleDisplayedLengthChange(itemId, length)}
-                        />
-                    );
-                })}
+                <div
+                    style={{
+                        width: '100%',
+                        lineHeight: 0.9,
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                    }}
+                >
+                    {texts.map((item) => {
+                        const itemId = String(item.id);
+                        return (
+                            <TextItem
+                                key={item.id}
+                                item={item}
+                                isNew={newTextIds.has(itemId)}
+                                onDisplayedLengthChange={(length) => handleDisplayedLengthChange(itemId, length)}
+                            />
+                        );
+                    })}
+                </div>
             </div>
-        </div>
+
+            {/* Overlay for new items */}
+            {currentOverlay && (() => {
+                // Adjust font size based on text length (max 100 chars)
+                const textLength = currentOverlay.content.length;
+                let fontSize: string;
+
+                if (textLength <= 30) {
+                    fontSize = 'clamp(4rem, 20vw, 15rem)';
+                } else if (textLength <= 60) {
+                    fontSize = 'clamp(3rem, 15vw, 12rem)';
+                } else {
+                    fontSize = 'clamp(2rem, 10vw, 8rem)';
+                }
+
+                return (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 9999,
+                            pointerEvents: 'none',
+                            fontFamily: "'GrotzecPoster', var(--font-geist-sans)",
+                            textTransform: 'uppercase',
+                        }}
+                    >
+                        <div
+                            style={{
+                                fontSize: fontSize,
+                                color: 'var(--accent)',
+                                fontWeight: 900,
+                                textAlign: 'center',
+                                padding: '2rem',
+                                lineHeight: 1,
+                                wordWrap: 'break-word',
+                                maxWidth: '90vw',
+                                transition: overlayExiting ? 'opacity 0.3s ease-out' : 'none',
+                                opacity: overlayExiting ? 0 : 1,
+                            }}
+                        >
+                            {currentOverlay.content.slice(0, overlayDisplayedLength)}
+                            {overlayDisplayedLength < currentOverlay.content.length && (
+                                <span style={{ opacity: 0.5 }}>|</span>
+                            )}
+                        </div>
+                    </div>
+                );
+            })()}
+        </>
     );
 }
 

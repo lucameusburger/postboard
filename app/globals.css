@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'GrotzecPoster';
+  src: url('/GrotzecPoster-XCondensedBold.otf') format('opentype');
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #000000;
   --accent: #f6d91f;
+  --font-custom: 'GrotzecPoster', var(--font-geist-sans);
 }
 
 @theme inline {
@@ -17,5 +24,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans);
+  font-family: var(--font-custom);
 }
