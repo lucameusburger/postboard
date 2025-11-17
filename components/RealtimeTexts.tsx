@@ -147,7 +147,7 @@ export default function RealtimeTexts({
 
             // Try a few sizes to find the best fit
             for (let testSize = maxFontSize; testSize >= minFontSize; testSize -= 5) {
-                const charWidthMultiplier = 0.6;
+                const charWidthMultiplier = 0.5;
                 const charsPerLine = Math.max(1, Math.floor(availableWidth / (testSize * charWidthMultiplier)));
                 const estimatedLines = Math.ceil(totalChars / charsPerLine);
                 const totalHeight = estimatedLines * testSize * lineHeight;
