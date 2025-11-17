@@ -52,6 +52,10 @@ export default function RealtimeTexts({
                                 const newText = data as Post;
                                 setTexts((prev) => [...prev, newText]);
                                 setNewTextIds((prev) => new Set(prev).add(String(newText.id)));
+                                // Calculate animation duration based on text length
+                                // TextItem adds "#" prefix and " " suffix, and uses 60ms per character
+                                const fullTextLength = `#${newText.content} `.length;
+                                const animationDuration = fullTextLength * 60;
                                 // Remove from newTextIds after animation completes
                                 setTimeout(() => {
                                     setNewTextIds((prev) => {
@@ -59,7 +63,7 @@ export default function RealtimeTexts({
                                         updated.delete(String(newText.id));
                                         return updated;
                                     });
-                                }, 1000);
+                                }, animationDuration);
                             }
                         }
                     }
