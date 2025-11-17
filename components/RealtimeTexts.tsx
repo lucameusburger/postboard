@@ -21,13 +21,19 @@ export default function RealtimeTexts({
     initialTexts,
     collectionName,
 }: RealtimeTextsProps) {
-    const [texts, setTexts] = useState<Post[]>(initialTexts);
+    // Ensure initial texts are sorted by date_created (oldest first, latest at end)
+    const sortedInitialTexts = [...initialTexts].sort((a, b) => {
+        const dateA = a.date_created ? new Date(a.date_created).getTime() : 0;
+        const dateB = b.date_created ? new Date(b.date_created).getTime() : 0;
+        return dateA - dateB;
+    });
+    const [texts, setTexts] = useState<Post[]>(sortedInitialTexts);
     const [newTextIds, setNewTextIds] = useState<Set<string>>(new Set());
     // Initialize displayed lengths for initial texts
     // Logo counts as 1 character, then text content + space
     const [displayedLengths, setDisplayedLengths] = useState<Map<string, number>>(() => {
         const initialMap = new Map<string, number>();
-        initialTexts.forEach((text) => {
+        sortedInitialTexts.forEach((text) => {
             const fullText = `${text.content} `;
             // Logo (1) + text length
             initialMap.set(String(text.id), fullText.length + 1);
@@ -136,7 +142,15 @@ export default function RealtimeTexts({
                                 : message.data;
                             if (data && typeof data === 'object' && 'id' in data && 'content' in data) {
                                 const newText = data as Post;
-                                setTexts((prev) => [...prev, newText]);
+                                setTexts((prev) => {
+                                    // Insert new text in the correct position based on date_created
+                                    const updated = [...prev, newText];
+                                    return updated.sort((a, b) => {
+                                        const dateA = a.date_created ? new Date(a.date_created).getTime() : 0;
+                                        const dateB = b.date_created ? new Date(b.date_created).getTime() : 0;
+                                        return dateA - dateB;
+                                    });
+                                });
                                 setNewTextIds((prev) => new Set(prev).add(String(newText.id)));
                                 // Initialize displayed length to 0 for new text (will animate)
                                 setDisplayedLengths((prev) => {
@@ -296,7 +310,6 @@ export default function RealtimeTexts({
                         lineHeight: 0.92,
                         wordWrap: 'break-word',
                         overflowWrap: 'break-word',
-                        overflow: 'hidden',
                     }}
                 >
                     {texts.map((item) => {

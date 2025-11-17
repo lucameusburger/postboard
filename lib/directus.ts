@@ -25,11 +25,14 @@ export { collectionName };
 export interface Post {
   id: number;
   content: string;
+  date_created?: string;
 }
 
 export async function getTexts(): Promise<Post[]> {
   const result = await directus.request<Post[]>(
-    readItems(collectionName)
+    readItems(collectionName, {
+      sort: ['date_created'],
+    })
   );
   return result;
 }
