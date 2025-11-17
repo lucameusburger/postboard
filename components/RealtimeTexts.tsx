@@ -142,7 +142,7 @@ export default function RealtimeTexts({
 
             // Try different font sizes to find the best fit
             // We want: (estimatedLines * fontSize * lineHeight) <= availableHeight
-            const lineHeight = 1.2; // Line height multiplier
+            const lineHeight = 1; // Line height multiplier
 
             // Iterative approach to find optimal font size
             let bestSize = minFontSize;
@@ -204,7 +204,7 @@ export default function RealtimeTexts({
             <div
                 style={{
                     width: '100%',
-                    lineHeight: 1.2,
+                    lineHeight: 0.9,
                     wordWrap: 'break-word',
                     overflowWrap: 'break-word',
                 }}
