@@ -281,12 +281,11 @@ export default function RealtimeTexts({
                 style={{
                     fontSize: `${fontSize}px`,
                     transition: 'font-size 0.3s ease-out',
-                    height: '100vh',
-                    width: '100vw',
+                    height: '100%',
+                    width: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '2rem',
                     boxSizing: 'border-box',
                     overflow: 'hidden',
                 }}
@@ -294,9 +293,10 @@ export default function RealtimeTexts({
                 <div
                     style={{
                         width: '100%',
-                        lineHeight: 0.9,
+                        lineHeight: 0.92,
                         wordWrap: 'break-word',
                         overflowWrap: 'break-word',
+                        overflow: 'hidden',
                     }}
                 >
                     {texts.map((item) => {

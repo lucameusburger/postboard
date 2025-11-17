@@ -13,8 +13,8 @@ export default async function Home({
   const isPresentation = params?.presentation === 'true';
 
   return (
-    <div className={isPresentation ? "h-screen w-screen overflow-hidden" : "min-h-screen text-5xl"}>
-      <main className={isPresentation ? "h-full w-full" : "mx-auto p-4"}>
+    <div className={"h-screen w-screen overflow-hidden text-5xl"}>
+      <main className={"h-full w-full p-4"}>
         <RealtimeTexts initialTexts={data} collectionName={collectionName} />
       </main>
 

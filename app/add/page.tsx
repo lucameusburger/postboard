@@ -1,17 +1,22 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import FixedButton from '@/components/FixedButton';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function AddTextPage() {
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Autofocus the textarea when component mounts
+        textareaRef.current?.focus();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -43,50 +48,37 @@ export default function AddTextPage() {
         }
     };
 
+    const MAX_LENGTH = 100;
+
     return (
-        <div className="min-h-screen text-5xl">
-            <main className="container mx-auto max-w-2xl p-4">
+        <div className="min-h-screen text-5xl flex flex-col">
+            <main className="flex-1 flex flex-col p-4 pb-24 relative">
+                <form ref={formRef} onSubmit={handleSubmit} className="flex-1 flex flex-col">
+                    <textarea
+                        ref={textareaRef}
+                        id="content"
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        required
+                        maxLength={MAX_LENGTH}
+                        className="flex-1 w-full text-foreground placeholder-zinc-500 bg-transparent border-none outline-none resize-none focus:outline-none"
+                        placeholder={process.env.NEXT_PUBLIC_ADD_TEXT || "Für mich ist ..."}
+                    />
 
-
-                <div className="">
-                    <div className="flex justify-between items-center">
-                        <h1 className="mb-6 text-foreground">
-                            {process.env.NEXT_PUBLIC_ADD_TEXT || "Text hinzufügen"}
-                        </h1>
-                    </div>
-
-                    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6 pb-24">
-                        <div>
-                            <label
-                                htmlFor="content"
-                                className=" mb-2 text-sm font-medium text-foreground  sr-only"
-                            >
-                                Text
-                            </label>
-                            <textarea
-                                id="content"
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                required
-                                rows={10}
-                                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-foreground placeholder-zinc-500 focus:border-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
-                                placeholder="Für mich ist ..."
-                            />
+                    {error && (
+                        <div className="rounded-lg bg-red-50 p-4 text-red-800 text-base mb-4">
+                            {error}
                         </div>
-
-                        {error && (
-                            <div className="rounded-lg bg-red-50 p-4 text-red-800">
-                                {error}
-                            </div>
-                        )}
-                    </form>
+                    )}
+                </form>
+                <div className="absolute top-4 right-4 text-sm text-zinc-400">
+                    {content.length}/{MAX_LENGTH}
                 </div>
             </main>
 
             <FixedButton
                 type="submit"
-                className='max-w-2xl mx-auto'
-                disabled={isSubmitting}
+                disabled={isSubmitting || !content.trim()}
                 onClick={() => formRef.current?.requestSubmit()}
             >
                 {isSubmitting ? 'Speichern...' : 'Speichern'}
