@@ -2,7 +2,6 @@ import "./globals.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 
-import CustomFont from "@/components/CustomFont";
 import type { Metadata } from "next";
 
 const geistSans = Geist({
@@ -30,7 +29,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CustomFont />
         {children}
       </body>
     </html>

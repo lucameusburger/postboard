@@ -4,7 +4,6 @@
   --background: #ffffff;
   --foreground: #000000;
   --accent: #f6d91f;
-  --font-custom: var(--font-geist-sans);
 }
 
 @theme inline {
@@ -13,11 +12,10 @@
   --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-custom: var(--font-custom, var(--font-geist-sans));
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-custom, Arial, Helvetica, sans-serif);
+  font-family: var(--font-geist-sans);
 }

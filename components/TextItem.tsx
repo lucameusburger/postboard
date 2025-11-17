@@ -129,12 +129,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
     const firstSpaceIndex = displayedText.indexOf(' ');
     const firstWordEnd = firstSpaceIndex === -1 ? displayedText.length : firstSpaceIndex;
 
-    // Get custom font name if set
-    const customFontName = process.env.NEXT_PUBLIC_CUSTOM_FONT;
-    const fontFamily = customFontName
-        ? `'${customFontName.replace(/\.(otf|ttf|woff|woff2)$/i, '').replace(/[^a-zA-Z0-9]/g, '-')}', var(--font-geist-sans)`
-        : 'var(--font-geist-sans)';
-
     // Split text into first word and rest
     const firstWordText = displayedText.slice(0, firstWordEnd);
     const restOfText = displayedText.slice(firstWordEnd);
@@ -145,7 +139,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
         <span
             style={{
                 display: 'inline',
-                fontFamily: fontFamily,
             }}
         >
             {showLogo && firstWordText.length > 0 && (
@@ -170,7 +163,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                                     key={index}
                                     style={{
                                         display: 'inline',
-                                        fontFamily: fontFamily,
                                         fontWeight: 400,
                                     }}
                                 >
@@ -187,7 +179,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                                     key={index}
                                     style={{
                                         display: 'inline',
-                                        fontFamily: fontFamily,
                                         fontWeight: 400,
                                     }}
                                 >
@@ -206,7 +197,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                                     key={index}
                                     style={{
                                         display: 'inline',
-                                        fontFamily: fontFamily,
                                         fontWeight: 400,
                                     }}
                                 >
@@ -223,7 +213,7 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                                 key={index}
                                 style={{
                                     display: 'inline',
-                                    fontFamily: fontFamily,
+
                                     fontWeight: fontWeight,
                                     transition: 'font-weight 0.05s linear',
                                 }}
@@ -257,7 +247,7 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                             key={actualIndex}
                             style={{
                                 display: 'inline',
-                                fontFamily: fontFamily,
+
                                 fontWeight: 400,
                             }}
                         >
@@ -274,7 +264,7 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                             key={actualIndex}
                             style={{
                                 display: 'inline',
-                                fontFamily: fontFamily,
+
                                 fontWeight: 400,
                             }}
                         >
@@ -293,7 +283,7 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                             key={actualIndex}
                             style={{
                                 display: 'inline',
-                                fontFamily: fontFamily,
+
                                 fontWeight: 400,
                             }}
                         >
@@ -310,7 +300,7 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                         key={actualIndex}
                         style={{
                             display: 'inline',
-                            fontFamily: fontFamily,
+
                             fontWeight: fontWeight,
                             transition: 'font-weight 0.05s linear',
                         }}
