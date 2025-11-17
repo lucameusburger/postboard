@@ -139,6 +139,7 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
         <span
             style={{
                 display: 'inline',
+                letterSpacing: '-0.04em',
             }}
         >
             {showLogo && firstWordText.length > 0 && (
@@ -213,7 +214,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                                 key={index}
                                 style={{
                                     display: 'inline',
-
                                     fontWeight: fontWeight,
                                     transition: 'font-weight 0.05s linear',
                                 }}
@@ -247,7 +247,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                             key={actualIndex}
                             style={{
                                 display: 'inline',
-
                                 fontWeight: 400,
                             }}
                         >
@@ -264,7 +263,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                             key={actualIndex}
                             style={{
                                 display: 'inline',
-
                                 fontWeight: 400,
                             }}
                         >
@@ -283,7 +281,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                             key={actualIndex}
                             style={{
                                 display: 'inline',
-
                                 fontWeight: 400,
                             }}
                         >
@@ -300,7 +297,6 @@ export default function TextItem({ item, isNew = false, onDisplayedLengthChange 
                         key={actualIndex}
                         style={{
                             display: 'inline',
-
                             fontWeight: fontWeight,
                             transition: 'font-weight 0.05s linear',
                         }}

@@ -343,6 +343,7 @@ export default function RealtimeTexts({
                 return (
                     <div
                         style={{
+                            backgroundColor: 'var(--accent)',
                             position: 'fixed',
                             top: 0,
                             left: 0,
@@ -355,20 +356,22 @@ export default function RealtimeTexts({
                             pointerEvents: 'none',
                             fontFamily: "'GrotzecPoster', var(--font-geist-sans)",
                             textTransform: 'uppercase',
+                            transition: overlayExiting ? 'opacity 0.3s ease-out' : 'none',
+                            opacity: overlayExiting ? 0 : 1,
+
                         }}
                     >
                         <div
                             style={{
                                 fontSize: fontSize,
-                                color: 'var(--accent)',
+                                color: 'var(--background)',
                                 fontWeight: 900,
                                 textAlign: 'center',
                                 padding: '2rem',
                                 lineHeight: 1,
                                 wordWrap: 'break-word',
                                 maxWidth: '90vw',
-                                transition: overlayExiting ? 'opacity 0.3s ease-out' : 'none',
-                                opacity: overlayExiting ? 0 : 1,
+
                             }}
                         >
                             {currentOverlay.content.slice(0, overlayDisplayedLength)}
