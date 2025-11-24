@@ -296,7 +296,7 @@ export default function TypewriterTexts({
                 return (
                     <div
                         style={{
-                            backgroundColor: 'var(--background)',
+                            // backgroundColor: 'var(--background)',
                             position: 'fixed',
                             top: 0,
                             left: 0,
